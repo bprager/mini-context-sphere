@@ -1,0 +1,57 @@
+# Generic hypergraph schema for the Serverless FastMCP Starter
+# This is intentionally minimal and domain neutral.
+# Tutorials (like LinkedIn) can override this via SCHEMA_PATH.
+
+meta:
+  name: default_hypergraph
+  version: "1.0"
+  description: >
+    Generic schema and extraction hints for building a SQLite based
+    hypergraph representing people, organizations, roles, projects,
+    skills and topics.
+
+entities:
+  - label: Person
+    pk: [name]
+    examples:
+      - "Jane Doe"
+      - "Ada Lovelace"
+
+  - label: Organization
+    pk: [name]
+    examples:
+      - "Example Corp"
+      - "ACME Inc."
+
+  - label: Role
+    pk: [title, organization, start_date]
+    examples:
+      - "Senior Software Engineer"
+      - "Director Delivery Management"
+
+  - label: Project
+    pk: [name, organization]
+    examples:
+      - "Internal search revamp"
+      - "Customer onboarding platform"
+
+  - label: Skill
+    pk: [name]
+    examples:
+      - "Python"
+      - "Cloud architecture"
+      - "Neo4j"
+
+  - label: Topic
+    pk: [name]
+    examples:
+      - "LLM systems"
+      - "FinOps"
+      - "Mentorship"
+
+  - label: Artifact
+    pk: [name]
+    examples:
+      - "System design doc"
+      - "Conference talk"
+
