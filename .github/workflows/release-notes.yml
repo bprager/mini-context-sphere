@@ -1,0 +1,62 @@
+name: Release Notes
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version (e.g., 1.1.5)"
+        required: true
+        type: string
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout default branch
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Set VERSION variable
+        run: echo "VERSION=${{ github.event.inputs.version || github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Generate release notes from CHANGELOG
+        run: |
+          python scripts/generate_release_notes.py --version "$VERSION" --out release_notes.md
+
+      - name: Create or update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: v${{ env.VERSION }}
+          body_path: release_notes.md
+          overwrite: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update version badge
+        run: |
+          python scripts/update_version_badge.py --version "$VERSION"
+
+      - name: Commit and push badge if changed (to main)
+        run: |
+          if git diff --quiet; then
+            echo "No changes to commit";
+          else
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git add docs/badges/version.svg
+            git commit -m "docs(badge): update version badge for v$VERSION"
+            git push origin HEAD:main
+          fi
