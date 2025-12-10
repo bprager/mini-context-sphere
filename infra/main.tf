@@ -18,7 +18,7 @@ provider "google" {
 resource "google_storage_bucket" "context_bucket" {
   name          = "${var.project_id}-context-sphere"
   location      = var.region
-  force_destroy = true
+  force_destroy = false  # Set to true only in non-production environments
   
   uniform_bucket_level_access = true
   

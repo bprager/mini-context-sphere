@@ -13,10 +13,11 @@ from pydantic import BaseModel
 app = FastAPI()
 
 # Add CORS middleware to allow frontend calls
+# Note: In production, restrict allow_origins to specific domains
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,  # Must be False when using wildcard origins
     allow_methods=["*"],
     allow_headers=["*"],
 )

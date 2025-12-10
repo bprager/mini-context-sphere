@@ -255,14 +255,14 @@
             });
             
             html += `
-                <button class="toggle-json" onclick="toggleJson()">Show Raw JSON</button>
+                <button class="toggle-json" onclick="toggleJson(event)">Show Raw JSON</button>
                 <div id="jsonView" style="display: none;" class="json-view"></div>
             `;
             
             resultsDiv.innerHTML = html;
         }
         
-        function toggleJson() {
+        function toggleJson(event) {
             const jsonView = document.getElementById('jsonView');
             const toggleBtn = event.target;
             

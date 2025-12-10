@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info
+.venv
+venv/
+env/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# Test & Coverage
+.pytest_cache
+.coverage
+htmlcov/
+
+# Documentation
+*.md
+LICENSE
+
+# Terraform
+infra/
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Temporary files
+.DS_Store
+*.log
