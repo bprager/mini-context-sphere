@@ -14,6 +14,8 @@ app = FastAPI()
 
 # Add CORS middleware to allow frontend calls
 # Note: In production, restrict allow_origins to specific domains
+# Example: allow_origins=["https://yourdomain.com"]
+# Or use environment variable: allow_origins=os.getenv("CORS_ORIGINS", "*").split(",")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -90,13 +92,16 @@ async def mcp_query(request: QueryRequest) -> JSONResponse:
         with get_db() as conn:
             cursor = conn.cursor()
             
+            # Escape LIKE special characters to prevent SQL injection via wildcards
+            escaped_query = request.query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+            
             # Simple query - search for keys or values containing the query string
             cursor.execute("""
                 SELECT id, key, value, created_at
                 FROM context_data
-                WHERE key LIKE ? OR value LIKE ?
+                WHERE key LIKE ? ESCAPE '\\' OR value LIKE ? ESCAPE '\\'
                 ORDER BY created_at DESC
-            """, (f"%{request.query}%", f"%{request.query}%"))
+            """, (f"%{escaped_query}%", f"%{escaped_query}%"))
             
             rows = cursor.fetchall()
             results = [
@@ -116,7 +121,10 @@ async def mcp_query(request: QueryRequest) -> JSONResponse:
             })
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Log the full error for debugging but don't expose details to client
+        import logging
+        logging.error(f"Query error: {str(e)}")
+        raise HTTPException(status_code=500, detail="An error occurred while processing your query")
 
 
 # Mount static files for serving the frontend

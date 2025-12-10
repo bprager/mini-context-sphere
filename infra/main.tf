@@ -22,6 +22,9 @@ resource "google_storage_bucket" "context_bucket" {
   
   uniform_bucket_level_access = true
   
+  # Lifecycle rule: Delete objects older than 30 days
+  # Adjust or remove this in production based on your data retention needs
+  
   versioning {
     enabled = true
   }
