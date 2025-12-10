@@ -1,10 +1,12 @@
-AI dev assistant goal: starter for static site plus FastAPI plus SQLite on GCP. All project guidance lives in .vibe/*.md.
+AI dev assistant goal: starter for static site plus FastAPI plus gRPC MCP plus SQLite on GCP. All guidance lives in .vibe/*.md and docs/.
 
-Create:
-- app/main.py (FastAPI, /health and /mcp/query using SQLite app/db/data.db, gRPC MCP service plus HTTP JSON facade)
-- static-site/index.html (form calling JSON API)
-- Dockerfile for Cloud Run
-- requirements.txt (use uv)
-- infra/ Terraform for bucket and Cloud Run v2, public, vars project_id, region, image
-- keep .vibe/STATUS.md updated
+Focus:
+- app/ backend and SQLite snapshot
+- static-site/ minimal UI calling HTTP JSON
+- pipeline/ builds PostgreSQL hypergraph from markdown and can export SQLite
+- tutorials/linkedin/ bootstrap profile markdown from saved profile.html
+
+Keep .vibe/STATUS.md up to date.
+
+Roadmap: use `docs/roadmap.md` for human readers and `.vibe/ROADMAP.md` for AI helpers.
 
