@@ -4,6 +4,8 @@
 
 Minimal starter for a static site plus FastAPI plus gRPC MCP backend on Google Cloud Run, with SQLite for local data and Terraform for infra. Designed to stay in the free tier for small workloads.
 
+For planned features and future directions see `docs/roadmap.md`.
+
 ## Features
 
 - Static site on Google Cloud Storage
