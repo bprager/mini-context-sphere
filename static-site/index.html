@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Context Sphere</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95em;
+        }
+        
+        .query-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        button {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results {
+            margin-top: 20px;
+        }
+        
+        .result-count {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        
+        .result-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+        }
+        
+        .result-key {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .result-value {
+            color: #555;
+            line-height: 1.5;
+        }
+        
+        .result-meta {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 8px;
+        }
+        
+        .error {
+            background: #fee;
+            border-left: 4px solid #f44;
+            padding: 15px;
+            border-radius: 4px;
+            color: #c33;
+            margin-top: 20px;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #667eea;
+            padding: 20px;
+        }
+        
+        .json-view {
+            background: #2d2d2d;
+            color: #f8f8f8;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .toggle-json {
+            background: #f0f0f0;
+            color: #333;
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .toggle-json:hover {
+            background: #e0e0e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 Mini Context Sphere</h1>
+        <p class="subtitle">Query your context database</p>
+        
+        <form class="query-form" onsubmit="submitQuery(event)">
+            <input 
+                type="text" 
+                id="queryInput" 
+                placeholder="Enter your search query..." 
+                required
+            />
+            <button type="submit" id="submitBtn">Search</button>
+        </form>
+        
+        <div id="results"></div>
+    </div>
+    
+    <script>
+        let lastResponse = null;
+        
+        async function submitQuery(event) {
+            event.preventDefault();
+            
+            const queryInput = document.getElementById('queryInput');
+            const submitBtn = document.getElementById('submitBtn');
+            const resultsDiv = document.getElementById('results');
+            const query = queryInput.value.trim();
+            
+            if (!query) return;
+            
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            resultsDiv.innerHTML = '<div class="loading">Searching...</div>';
+            
+            try {
+                const response = await fetch('/mcp/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                lastResponse = data;
+                displayResults(data);
+                
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="error">
+                        <strong>Error:</strong> ${error.message}
+                    </div>
+                `;
+            } finally {
+                submitBtn.disabled = false;
+            }
+        }
+        
+        function displayResults(data) {
+            const resultsDiv = document.getElementById('results');
+            
+            if (data.count === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="result-count">No results found for "${data.query}"</div>
+                `;
+                return;
+            }
+            
+            let html = `
+                <div class="result-count">Found ${data.count} result${data.count !== 1 ? 's' : ''} for "${data.query}"</div>
+            `;
+            
+            data.results.forEach(item => {
+                html += `
+                    <div class="result-item">
+                        <div class="result-key">${escapeHtml(item.key)}</div>
+                        <div class="result-value">${escapeHtml(item.value)}</div>
+                        <div class="result-meta">ID: ${item.id} | Created: ${item.created_at}</div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                <button class="toggle-json" onclick="toggleJson(event)">Show Raw JSON</button>
+                <div id="jsonView" style="display: none;" class="json-view"></div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+        
+        function toggleJson(event) {
+            const jsonView = document.getElementById('jsonView');
+            const toggleBtn = event.target;
+            
+            if (jsonView.style.display === 'none') {
+                jsonView.textContent = JSON.stringify(lastResponse, null, 2);
+                jsonView.style.display = 'block';
+                toggleBtn.textContent = 'Hide Raw JSON';
+            } else {
+                jsonView.style.display = 'none';
+                toggleBtn.textContent = 'Show Raw JSON';
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+</body>
+</html>
