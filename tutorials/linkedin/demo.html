@@ -1,0 +1,62 @@
+
+---
+
+### `static-site/linkedin-query-snippet.html`
+*(HTML snippet to drop into `static-site/index.html`)*
+
+```html
+<section id="linkedin-demo">
+  <h2>Query your LinkedIn hypergraph</h2>
+
+  <form id="linkedin-form">
+    <label for="linkedin-input">Ask a question about your career</label>
+    <input
+      id="linkedin-input"
+      type="text"
+      placeholder="Which skills did I use at EPAM?"
+      autocomplete="off"
+      required
+    />
+    <button type="submit">Ask</button>
+  </form>
+
+  <pre id="linkedin-output">{ "hint": "Results will appear here" }</pre>
+</section>
+
+<script>
+  // Set this to your API base:
+  // - local dev: "http://localhost:8000"
+  // - Cloud Run: output of terraform (cloud_run_url)
+  const API_BASE = "http://localhost:8000";
+
+  const form = document.getElementById("linkedin-form");
+  const input = document.getElementById("linkedin-input");
+  const output = document.getElementById("linkedin-output");
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const query = input.value.trim();
+    if (!query) return;
+
+    output.textContent = "Loading...";
+
+    try {
+      const resp = await fetch(`${API_BASE}/mcp/query`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query }),
+      });
+
+      if (!resp.ok) {
+        output.textContent = `Error: ${resp.status} ${resp.statusText}`;
+        return;
+      }
+
+      const data = await resp.json();
+      output.textContent = JSON.stringify(data, null, 2);
+    } catch (err) {
+      output.textContent = "Network error: " + err;
+    }
+  });
+</script>
+

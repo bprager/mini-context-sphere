@@ -1,0 +1,78 @@
+# LinkedIn tuned hypergraph schema for the tutorial
+# Use by setting:  export SCHEMA_PATH="tutorials/linkedin/graph_schema.yaml"
+
+meta:
+  name: linkedin_skill_graph
+  version: "1.0"
+  description: >
+    Schema and extraction hints for building a SQLite based hypergraph
+    from a LinkedIn profile, focusing on person, roles, organizations,
+    projects, skills, certifications and activities.
+
+entities:
+  - label: Person
+    pk: [name]
+    examples:
+      - "Bernd Prager"
+      - "Jane Doe"
+
+  - label: Role
+    pk: [title, organization, start_date]
+    examples:
+      - "Director Delivery Management"
+      - "Senior Software Engineer"
+
+  - label: Organization
+    pk: [name]
+    examples:
+      - "EPAM Systems, Inc."
+      - "OpenAI"
+      - "Wirtschaftsjunioren Rostock"
+
+  - label: Project
+    pk: [name, organization]
+    examples:
+      - "Insurance KG RAG POC"
+      - "Internal LLM platform rollout"
+
+  - label: Certification
+    pk: [name, issuer]
+    examples:
+      - "Machine Learning, Coursera"
+      - "TOGAF 9, The Open Group"
+
+  - label: Activity
+    pk: [name, organization]
+    examples:
+      - "State President, Wirtschaftsjunioren"
+      - "Meetup organizer, Local AI Group"
+
+  - label: Event
+    pk: [name, date]
+    examples:
+      - "LLM Architecture Patterns, 2023 05 17"
+      - "Cloud Summit, 2024 10 01"
+
+  - label: Skill
+    pk: [name]
+    examples:
+      - "Python"
+      - "Neo4j"
+      - "FinOps"
+      - "Mentorship"
+
+  - label: Tool
+    pk: [name]
+    examples:
+      - "LangChain"
+      - "LlamaIndex"
+      - "Vue 3"
+      - "Terraform"
+
+  - label: Topic
+    pk: [name]
+    examples:
+      - "LLM systems"
+      - "Software architecture"
+      - "Cloud cost optimization"
+
