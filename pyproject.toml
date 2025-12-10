@@ -9,3 +9,11 @@ dependencies = [
     "pydantic>=2.12.5",
     "uvicorn[standard]>=0.38.0",
 ]
+
+[dependency-groups]
+dev = [
+    "deptry>=0.24.0",
+    "mypy>=1.19.0",
+    "pytest-cov>=7.0.0",
+    "ruff>=0.14.8",
+]
