@@ -43,12 +43,12 @@ jobs:
       - name: Markdown format check (mdformat)
         run: |
           echo "==> Markdown format check (mdformat --check)"
-          uv run mdformat --check .
+          uv run mdformat --check README.md CHANGELOG.md docs .vibe tutorials static-site
 
       - name: Markdown lint (pymarkdown)
         run: |
           echo "==> Markdown lint (pymarkdown)"
-          uv run pymarkdown --config .pymarkdown.json scan .
+          uv run pymarkdown --config .pymarkdown.json scan README.md CHANGELOG.md docs .vibe tutorials static-site
 
       - name: Type check (mypy)
         run: |
