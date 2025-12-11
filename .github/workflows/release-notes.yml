@@ -28,8 +28,15 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Set VERSION variable
-        run: echo "VERSION=${{ github.event.inputs.version || github.ref_name }}" >> $GITHUB_ENV
+      - name: Set version variables
+        shell: bash
+        run: |
+          VERSION_IN="${{ github.event.inputs.version || github.ref_name }}"
+          # strip optional leading 'v' to get plain version for changelog lookup and badge
+          VERSION_PLAIN="${VERSION_IN#v}"
+          TAG="v${VERSION_PLAIN}"
+          echo "VERSION=${VERSION_PLAIN}" >> "$GITHUB_ENV"
+          echo "TAG=${TAG}" >> "$GITHUB_ENV"
 
       - name: Generate release notes from CHANGELOG
         run: |
@@ -38,7 +45,7 @@ jobs:
       - name: Create or update GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ env.VERSION }}
+          tag_name: ${{ env.TAG }}
           name: v${{ env.VERSION }}
           body_path: release_notes.md
           overwrite: true
