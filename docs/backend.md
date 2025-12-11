@@ -126,8 +126,9 @@ Implementation notes:
 - HTTP JSON handlers should call the same query method that the gRPC handler uses
 - proto code generation is wired via `make proto` (grpcio‑tools)
 - generated files are excluded from lint and coverage
- 
+
 Enable local gRPC alongside FastAPI by setting `START_GRPC=true` and optionally `GRPC_PORT`.
+
 - follow `.vibe/API_SPEC.md` so JSON and gRPC stay consistent
 
 If you run gRPC and HTTP in the same process, ensure the server supports HTTP 2 for gRPC while still serving HTTP 1.1 JSON routes. Cloud Run can do this with a gRPC capable server stack.
