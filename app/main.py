@@ -42,8 +42,9 @@ def health():
 @app.post("/mcp/query")
 def mcp_query(payload: Query):
     logger.info("mcp_query_start", extra={"query": payload.query})
-    conn = connect()
+    conn = None
     try:
+        conn = connect()
         cur = conn.cursor()
         cur.execute(
             "SELECT id, content FROM documents WHERE content LIKE ? LIMIT 10",
@@ -54,9 +55,10 @@ def mcp_query(payload: Query):
         logger.exception("mcp_query_error")
         raise HTTPException(status_code=500, detail=str(exc)) from exc
     finally:
-        try:
-            conn.close()
-        except Exception:
-            pass
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
     logger.info("mcp_query_ok", extra={"result_count": len(rows)})
     return QueryResponse(results=[QueryResult(**row) for row in rows])
