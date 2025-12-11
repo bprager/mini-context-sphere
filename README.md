@@ -19,6 +19,14 @@ Minimal starter for a static site plus FastAPI plus gRPC MCP backend on Google C
 
 See the [roadmap](docs/roadmap.md) for planned features and future direction.
 
+## Quick Links
+
+- Run locally: `uv venv && uv pip install -r requirements.txt && uv run uvicorn app.main:app --reload`
+- Full QA suite: `uv sync --group dev && make qa` (details in the [testing & QA guide](docs/testing-qa.md))
+- Start with gRPC enabled: `START_GRPC=true uv run uvicorn app.main:app --reload` (see the [backend guide](docs/backend.md))
+- Generate gRPC stubs: `make proto` (proto in `proto/mcp.proto`)
+- Deploy to Cloud Run/GCS: follow the [infra guide](docs/infra.md)
+
 ## Features
 
 - Static site on Google Cloud Storage
