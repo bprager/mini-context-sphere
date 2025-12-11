@@ -10,6 +10,14 @@ This project is a small, opinionated starter for
 
 Use this as a template for lightweight tools, internal dashboards or agent backends that should stay cheap and easy to reason about.
 
+## Quick Links
+
+- Run locally: `uv venv && uv pip install -r requirements.txt && uv run uvicorn app.main:app --reload`
+- Full QA suite: `uv sync --group dev && make qa` (see the testing & QA guide)
+- Start with gRPC enabled: `START_GRPC=true uv run uvicorn app.main:app --reload` (see the backend guide)
+- Generate gRPC stubs: `make proto` (proto at `proto/mcp.proto`)
+- Deploy to GCP: follow the infra guide
+
 ______________________________________________________________________
 
 ## High level architecture
