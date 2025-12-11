@@ -7,6 +7,24 @@ and this project adheres to Semantic Versioning, https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.4.0] - 2025-12-11
+
+### Added
+
+- gRPC MCP service scaffold: `proto/mcp.proto`, async server (`grpc.aio`) with `Query` (streaming) and `UpsertNodes` RPCs; Makefile `proto` target.
+- Tests: async gRPC integration test exercising `Query` against a temp SQLite database.
+- Docs: `docs/mcp-grpc.md` design doc; roadmap updated with high‑priority gRPC work; backend docs updated with proto/codegen details and gRPC toggle.
+- QA: `.coveragerc` to exclude generated stubs and shim modules; deptry scope narrowed to project paths; `make qa` runs `make proto`.
+
+### Changed
+
+- FastAPI app can optionally start the gRPC server when `START_GRPC=true` (port via `GRPC_PORT`).
+- Dependency config updated for gRPC (`grpcio`, `grpcio-tools`, `pytest-asyncio`).
+
+### Notes
+
+- Future work: FTS5 and neighbor expansion, hyperedge/link tables and RPCs, shared query planner, health RPC, and optional split deployment for gRPC.
+
 ## [0.3.1] - 2025-12-11
 
 ### Fixed

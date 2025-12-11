@@ -15,7 +15,7 @@ ______________________________________________________________________
 ```text
 app/
   main.py          FastAPI app entry point, wiring, HTTP JSON routes
-  mcp_service.py   gRPC MCP service implementation (optional split)
+  mcp_service.py   gRPC MCP service implementation (async, grpc.aio)
   db/
     data.db        SQLite database (read heavy)
 ```
@@ -99,7 +99,7 @@ app/
   mcp_service.py   Python implementation generated from proto
 ```
 
-Proto sketch:
+Proto sketch (simplified excerpt, full in `proto/mcp.proto`):
 
 ```proto
 service McpService {
@@ -120,10 +120,14 @@ message QueryResponse {
 }
 ```
 
-Implementation goals:
+Implementation notes:
 
-- keep the business logic in the gRPC layer or in shared helpers
+- keep the business logic in shared helpers used by both gRPC and HTTP
 - HTTP JSON handlers should call the same query method that the gRPC handler uses
+- proto code generation is wired via `make proto` (grpcio‑tools)
+- generated files are excluded from lint and coverage
+ 
+Enable local gRPC alongside FastAPI by setting `START_GRPC=true` and optionally `GRPC_PORT`.
 - follow `.vibe/API_SPEC.md` so JSON and gRPC stay consistent
 
 If you run gRPC and HTTP in the same process, ensure the server supports HTTP 2 for gRPC while still serving HTTP 1.1 JSON routes. Cloud Run can do this with a gRPC capable server stack.

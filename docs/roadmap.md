@@ -4,6 +4,18 @@ This file sketches where the project is heading. It focuses on the hypergraph pi
 
 ______________________________________________________________________
 
+## High Priority (gRPC MCP service)
+
+- Define and implement a gRPC MCP service that mirrors the JSON facade and operates directly on the SQLite hypergraph.
+  - Author stable, generic proto definitions that map cleanly to the current schema (nodes/edges) and the planned hyperedge/link model.
+  - Optimize proto messages around `config/graph_schema.yaml` so `type` and role labels stay aligned with the domain vocabulary without frequent proto churn.
+  - Generate Python stubs and implement an async `grpc.aio` server with shared query logic used by both gRPC and HTTP JSON.
+  - Add a 1:1 HTTP-to-gRPC delegation for `/mcp/query` to keep the JSON facade thin and consistent.
+  - Create unit and integration tests (streaming and non-streaming) and wire them into CI.
+  - Deployment: run the gRPC server as a separate Cloud Run service or behind a gRPC-capable proxy; keep the static site on HTTP JSON only.
+
+See: docs/mcp-grpc.md for the proposed proto and service design.
+
 ## Now - 0.2 series
 
 - Finalize the SQLite hypergraph schema with explicit hyperedges and a bipartite `hyperedge_entities` link table.

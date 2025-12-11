@@ -1,0 +1,62 @@
+syntax = "proto3";
+package mcp;
+
+message NodeId { string id = 1; }
+message EdgeId { string id = 1; }
+message HyperedgeId { string id = 1; }
+
+message Json { string raw = 1; }
+
+message Node {
+  string id = 1;
+  string type = 2;
+  Json data = 3;
+}
+
+message Edge {
+  string id = 1;
+  string type = 2;
+  string source = 3;
+  string target = 4;
+  Json data = 5;
+}
+
+message HyperedgeEntity {
+  string entity_id = 1;
+  string role = 2;
+  int32 ordinal = 3;
+}
+
+message Hyperedge {
+  string id = 1;
+  string type = 2;
+  Json data = 3;
+  repeated HyperedgeEntity participants = 4;
+}
+
+message QueryRequest {
+  string query = 1;
+  int32 limit = 2;
+  bool expand_neighbors = 3;
+  int32 neighbor_budget = 4;
+}
+
+message QueryResult {
+  repeated Node nodes = 1;
+  repeated Edge edges = 2;
+  repeated Hyperedge hyperedges = 3;
+}
+
+message UpsertNodesRequest { repeated Node nodes = 1; }
+message UpsertEdgesRequest { repeated Edge edges = 1; }
+message UpsertHyperedgesRequest { repeated Hyperedge hyperedges = 1; }
+
+message Ack { bool ok = 1; string message = 2; }
+
+service McpService {
+  rpc Query (QueryRequest) returns (stream QueryResult);
+  rpc UpsertNodes (UpsertNodesRequest) returns (Ack);
+  rpc UpsertEdges (UpsertEdgesRequest) returns (Ack);
+  rpc UpsertHyperedges (UpsertHyperedgesRequest) returns (Ack);
+}
+

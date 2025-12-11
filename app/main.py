@@ -1,5 +1,9 @@
-# AI assistants: see .vibe/AI_DEV_INSTRUCTIONS.md and .vibe/API_SPEC.md
+"""FastAPI app and optional gRPC bootstrap.
 
+AI assistants: see `.vibe/AI_DEV_INSTRUCTIONS.md` and `.vibe/API_SPEC.md`.
+"""
+
+import asyncio
 import logging
 import os
 import sqlite3
@@ -7,6 +11,8 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+
+from .mcp_service import serve_grpc
 
 LOGGER_NAME = "mcp"
 DEFAULT_LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -85,3 +91,18 @@ def mcp_query(payload: Query):
                 pass
     logger.info("mcp_query_ok", extra={"result_count": len(rows)})
     return QueryResponse(results=[QueryResult(**row) for row in rows])
+
+
+# Optional: start gRPC server when running under uvicorn, if enabled by env
+_START_GRPC = os.getenv("START_GRPC", "false").lower() in {"1", "true", "yes"}
+_GRPC_PORT = int(os.getenv("GRPC_PORT", "50051"))
+if _START_GRPC:
+    try:
+
+        async def _start():
+            await serve_grpc(DB_PATH, port=_GRPC_PORT)
+
+        asyncio.get_event_loop().create_task(_start())
+        logger.info("grpc_bootstrap", extra={"port": _GRPC_PORT})
+    except Exception:  # pragma: no cover
+        logger.exception("grpc_bootstrap_error")

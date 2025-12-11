@@ -1,18 +1,16 @@
 # Status
 
-Version v0.3.1
+Version v0.4.0
 
 Done:
 
-- CI/QA: Makefile one‑command suite (`make qa`) with ruff, mypy, deptry, pytest+coverage and Codecov upload; GitHub Actions runs the same checks.
-- Tests: Comprehensive pytest suite across `app/` and `pipeline/`, coverage >90% (currently ~97%).
-- Docs: README streamlined for GitHub front page; testing details moved to `docs/testing-qa.md`; badges added (CI, CodeQL, Coverage, Release, Version, License, Python, mypy, ruff, pre-commit, Dependabot).
-- Releases: `release-notes` workflow generates notes from CHANGELOG and updates a version badge; v0.3.0 Release created; CHANGELOG includes 0.3.1 patch.
-- Tooling: Markdown formatter (mdformat) and linter (PyMarkdown) integrated; VS Code workspace configured for `.venv` and new Ruff extension.
+- gRPC: Added initial MCP gRPC service and proto (`proto/mcp.proto`), async server startup helper, Makefile `proto` target, and an integration test with grpc.aio.
+- HTTP: Optional gRPC bootstrap under FastAPI via `START_GRPC=true` and `GRPC_PORT` env var.
+- Docs: New `docs/mcp-grpc.md` design doc; roadmap updated with high‑priority gRPC work; backend docs mention proto generation and gRPC toggle.
+- QA: Deptry scoped to project paths; coverage config excludes generated files; `make qa` runs proto generation.
 
 Next:
 
-- Hypergraph: Add hyperedge/link tables to the SQLite model and complete wiring in `pipeline/hypergraph_writer.py`; extend tests to cover error branches.
-- Pipeline: Validate end‑to‑end run with the LinkedIn tutorial and feed `/mcp/query`.
-- Runtime alignment: Align Docker base image with Python 3.14 to match `pyproject.toml` (or relax the version bound).
-- Packaging: Update `[project].version` in `pyproject.toml` alongside CHANGELOG entries to keep metadata in sync.
+- Hypergraph: Add hyperedge/link tables to the SQLite model and extend the gRPC API with `UpsertEdges`/`UpsertHyperedges`.
+- Query: Implement FTS5 and neighbor expansion; unify HTTP `/mcp/query` and gRPC `Query` via a shared planner.
+- Deploy: Optionally split gRPC into a separate Cloud Run service; add a health RPC.

@@ -1,9 +1,10 @@
-PYTEST_FLAGS = -q --maxfail=1 --disable-warnings --cov=. --cov-report=term-missing --cov-report=xml:coverage.xml
+PYTEST_FLAGS = -q --maxfail=1 --disable-warnings --cov=. --cov-config=.coveragerc --cov-report=term-missing --cov-report=xml:coverage.xml
 
-.PHONY: qa test lint fmt typecheck deps coverage-upload fmt-check mdlint mdfmt-fix mdfmt-check
+.PHONY: qa test lint fmt typecheck deps coverage-upload fmt-check mdlint mdfmt-fix mdfmt-check proto
 
 qa: 
 	@echo "==> Starting QA suite"
+	$(MAKE) proto
 	$(MAKE) fmt-check
 	$(MAKE) lint
 	$(MAKE) mdfmt-check
@@ -49,7 +50,15 @@ typecheck:
 
 deps:
 	@echo "==> Dependency analysis (deptry)"
-	uv run deptry .
+	uv run deptry app pipeline tests
+
+proto:
+	@echo "==> Generating gRPC stubs (grpcio-tools)"
+	uv run python -m grpc_tools.protoc \
+		-I proto \
+		--python_out=app \
+		--grpc_python_out=app \
+		proto/mcp.proto
 
 coverage-upload:
 	@echo "==> Coverage upload (codecov)"; \

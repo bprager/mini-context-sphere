@@ -1,0 +1,8 @@
+[run]
+omit =
+    app/mcp_pb2.py
+    app/mcp_pb2_grpc.py
+    mcp_pb2.py
+    mcp_pb2_grpc.py
+    main.py
+

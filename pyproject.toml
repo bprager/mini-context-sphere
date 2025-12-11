@@ -1,6 +1,6 @@
 [project]
 name = "mini-context-sphere"
-version = "0.3.1"
+version = "0.4.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -9,6 +9,7 @@ dependencies = [
     "pydantic>=2.12.5",
     "uvicorn[standard]>=0.38.0",
     "pyyaml>=6.0.2",
+    "grpcio>=1.62.0",
 ]
 
 [dependency-groups]
@@ -24,15 +25,30 @@ dev = [
     "mdformat>=0.7.17",
     "mdformat-gfm>=0.3.6",
     "mdformat-frontmatter>=2.0.7",
+    "grpcio-tools>=1.62.0",
+    "pytest-asyncio>=0.24.0",
+]
+
+[tool.deptry]
+exclude = [
+    "app/mcp_pb2.py",
+    "app/mcp_pb2_grpc.py",
 ]
 
 [tool.deptry.per_rule_ignores]
 DEP002 = ["uvicorn"]
+DEP003 = ["google"]
+DEP001 = ["mcp_pb2", "mcp_pb2_grpc", "app", "pipeline"]
+DEP004 = ["pytest"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py314"
 src = ["app", "pipeline", "tests"]
+exclude = [
+  "app/mcp_pb2.py",
+  "app/mcp_pb2_grpc.py",
+]
 
 [tool.ruff.lint]
 select = [
