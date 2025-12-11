@@ -7,7 +7,6 @@
 [![CI](https://github.com/bprager/mini-context-sphere/actions/workflows/ci.yml/badge.svg)](https://github.com/bprager/mini-context-sphere/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/bprager/mini-context-sphere/actions/workflows/codeql.yml/badge.svg)](https://github.com/bprager/mini-context-sphere/actions/workflows/codeql.yml)
 [![Coverage](https://codecov.io/gh/bprager/mini-context-sphere/branch/main/graph/badge.svg)](https://codecov.io/gh/bprager/mini-context-sphere)
-[![Version](docs/badges/version.svg)](CHANGELOG.md)
 [![Release](https://img.shields.io/github/v/release/bprager/mini-context-sphere?include_prereleases&sort=semver)](https://github.com/bprager/mini-context-sphere/releases)
 [![License](https://img.shields.io/github/license/bprager/mini-context-sphere)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.14%2B-blue)](pyproject.toml)
@@ -38,7 +37,7 @@ uv pip install -r requirements.txt
 uv run uvicorn app.main:app --reload
 ```
 
-Then open http://localhost:8000 and hit `/health` or the JSON facade used by the static site.
+Then open <http://localhost:8000> and hit `/health` or the JSON facade used by the static site.
 
 ## Docs
 
