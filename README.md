@@ -17,9 +17,7 @@
 
 Minimal starter for a static site plus FastAPI plus gRPC MCP backend on Google Cloud Run, with SQLite for local data and Terraform for infra. Designed to stay in the free tier for small workloads.
 
-See the full feature roadmap in [docs/roadmap.md](docs/roadmap.md).
-
-For planned features and future directions see `docs/roadmap.md`.
+See the [roadmap](docs/roadmap.md) for planned features and future direction.
 
 ## Features
 
@@ -41,14 +39,14 @@ Then open <http://localhost:8000> and hit `/health` or the JSON facade used by t
 
 ## Docs
 
-- Overview: [docs/index.md](docs/index.md)
-- Backend: [docs/backend.md](docs/backend.md)
-- Static site: [docs/static-site.md](docs/static-site.md)
-- Infra: [docs/infra.md](docs/infra.md)
-- Dev env: [docs/dev-env.md](docs/dev-env.md)
-- Testing & QA: [docs/testing-qa.md](docs/testing-qa.md)
-- Roadmap: [docs/roadmap.md](docs/roadmap.md)
-- Design and AI guidance: see `.vibe/` for deeper architecture notes and API specs
+- Start with the big picture in the [overview](docs/index.md).
+- Build APIs and data flow via the [backend guide](docs/backend.md).
+- Shape and ship the UI with the [static site guide](docs/static-site.md).
+- Deploy on GCP using the [infra guide](docs/infra.md).
+- Set up your machine with the [dev environment guide](docs/dev-env.md).
+- Keep quality high using the [testing and QA guide](docs/testing-qa.md).
+- Track what’s coming next on the [roadmap](docs/roadmap.md).
+- For deeper architecture notes and API contracts, see the `.vibe/` folder.
 
 ## Deploy to GCP
 
