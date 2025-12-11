@@ -9,7 +9,6 @@
 [![Coverage](https://codecov.io/gh/bprager/mini-context-sphere/branch/main/graph/badge.svg)](https://codecov.io/gh/bprager/mini-context-sphere)
 [![Version](docs/badges/version.svg)](CHANGELOG.md)
 [![Release](https://img.shields.io/github/v/release/bprager/mini-context-sphere?include_prereleases&sort=semver)](https://github.com/bprager/mini-context-sphere/releases)
-[![Tag](https://img.shields.io/github/v/tag/bprager/mini-context-sphere?sort=semver)](https://github.com/bprager/mini-context-sphere/tags)
 [![License](https://img.shields.io/github/license/bprager/mini-context-sphere)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.14%2B-blue)](pyproject.toml)
 [![mypy](https://img.shields.io/badge/type_check-mypy-blue)](docs/testing-qa.md)
@@ -49,13 +48,8 @@ Then open http://localhost:8000 and hit `/health` or the JSON facade used by the
 - Infra: [docs/infra.md](docs/infra.md)
 - Dev env: [docs/dev-env.md](docs/dev-env.md)
 - Testing & QA: [docs/testing-qa.md](docs/testing-qa.md)
-- Design and AI guidance: see `.vibe/`
-  - [.vibe/AI_DEV_INSTRUCTIONS.md](.vibe/AI_DEV_INSTRUCTIONS.md)
-  - [.vibe/API_SPEC.md](.vibe/API_SPEC.md)
-  - [.vibe/ARCHITECTURE.md](.vibe/ARCHITECTURE.md)
-  - [.vibe/INFRA_NOTES.md](.vibe/INFRA_NOTES.md)
-  - [.vibe/STATIC_SITE.md](.vibe/STATIC_SITE.md)
-  - [.vibe/STATUS.md](.vibe/STATUS.md)
+- Roadmap: [docs/roadmap.md](docs/roadmap.md)
+- Design and AI guidance: see `.vibe/` for deeper architecture notes and API specs
 
 ## Deploy to GCP
 
