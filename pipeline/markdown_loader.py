@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 logger = logging.getLogger("pipeline.markdown")
 
@@ -67,4 +68,3 @@ def _load_single(path: Path) -> MarkdownDocument:
                     metadata[key.strip()] = value.strip()
 
     return MarkdownDocument(path=path, metadata=metadata, body=body)
-

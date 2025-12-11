@@ -4,7 +4,6 @@ import logging
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
 logger = logging.getLogger("pipeline.schema")
 
@@ -127,4 +126,3 @@ def load_schema(schema_path: Path | None = None) -> GraphSchema:
         },
     )
     return schema
-

@@ -4,7 +4,7 @@ The static site is a very small HTML and JavaScript frontend that talks to the b
 
 Use it as a basic UI for the MCP backend, or as a starting point for a richer app.
 
----
+______________________________________________________________________
 
 ## Layout
 
@@ -20,19 +20,19 @@ static-site/
 
 You can keep everything in `index.html` at first, then move script and styles into `assets/` when the page grows.
 
----
+______________________________________________________________________
 
 ## Responsibilities
 
 The static site has three simple jobs
 
-* display a form so the user can enter a query
-* call the backend JSON endpoint with that query
-* render the returned list of results
+- display a form so the user can enter a query
+- call the backend JSON endpoint with that query
+- render the returned list of results
 
 It does not talk to gRPC directly, that is handled by the backend, so the browser only uses HTTP and JSON.
 
----
+______________________________________________________________________
 
 ## Backend API usage
 
@@ -61,12 +61,12 @@ async function runQuery(text) {
 
 `API_BASE` should be
 
-* `http://localhost:8000` for local development
-* the Cloud Run service URL for deployed environments
+- `http://localhost:8000` for local development
+- the Cloud Run service URL for deployed environments
 
 You can later move this into a small `config.js` or derive it from an environment specific placeholder.
 
----
+______________________________________________________________________
 
 ## Basic page structure
 
@@ -136,7 +136,7 @@ function renderResults(results) {
 }
 ```
 
----
+______________________________________________________________________
 
 ## Local development
 
@@ -150,9 +150,9 @@ For quick frontend only work you can
    uv run uvicorn app.main:app --reload
    ```
 
-2. Open `static-site/index.html` directly in your browser
+1. Open `static-site/index.html` directly in your browser
 
-3. Set `API_BASE` in `app.js` to `http://localhost:8000`
+1. Set `API_BASE` in `app.js` to `http://localhost:8000`
 
 If you prefer a local static server instead of `file://` URLs
 
@@ -165,7 +165,7 @@ Then go to [http://localhost:8081](http://localhost:8081) and the page loads fro
 
 Make sure the backend has CORS enabled if you serve from a different port. You can add FastAPI `CORSMiddleware` for `http://localhost:8081` during development.
 
----
+______________________________________________________________________
 
 ## Deployed behavior
 
@@ -177,25 +177,24 @@ When you have deployed the backend to Cloud Run and created the static bucket
    const API_BASE = "https://mcp-api-xyz123-uc.a.run.app";
    ```
 
-2. Sync the static site to the bucket
+1. Sync the static site to the bucket
 
    ```bash
    gsutil rsync -r static-site/ gs://your-bucket-name
    ```
 
-3. Open the `static_site_url` from Terraform outputs
+1. Open the `static_site_url` from Terraform outputs
 
    The page will call the Cloud Run backend through the JSON facade.
 
 Later, when you add a custom domain or CDN, only the URLs change, the static site code remains the same.
 
----
+______________________________________________________________________
 
 ## Where to look next
 
-* For full architecture context, see `docs/index.md`
-* For backend API details and JSON shapes, see `docs/backend.md` and `.vibe/API_SPEC.md`
-* For infra and deployment, see `docs/infra.md` and `.vibe/INFRA_NOTES.md`
+- For full architecture context, see `docs/index.md`
+- For backend API details and JSON shapes, see `docs/backend.md` and `.vibe/API_SPEC.md`
+- For infra and deployment, see `docs/infra.md` and `.vibe/INFRA_NOTES.md`
 
 For deeper design notes aimed at AI assistants or future you, see `.vibe/STATIC_SITE.md`.
-

@@ -20,32 +20,47 @@ jobs:
 
       - name: Install uv
         run: |
+          echo "==> Installing uv"
           python -m pip install --upgrade pip
           pip install uv
 
       - name: Install dependencies
         run: |
+          echo "==> Installing dependencies (uv sync --group dev)"
           uv venv
-          uv pip install -r requirements.txt
-          # Dev/test tools
-          uv pip install -G dev
+          uv sync --group dev
 
       - name: Check formatting (ruff fmt --check)
         run: |
+          echo "==> Formatting check (ruff format --check)"
           uv run ruff format --check .
 
       - name: Lint (ruff)
         run: |
+          echo "==> Linting (ruff check)"
           uv run ruff check .
+
+      - name: Markdown format check (mdformat)
+        run: |
+          echo "==> Markdown format check (mdformat --check)"
+          uv run mdformat --check .
+
+      - name: Markdown lint (pymarkdown)
+        run: |
+          echo "==> Markdown lint (pymarkdown)"
+          uv run pymarkdown --config .pymarkdown.json scan .
 
       - name: Type check (mypy)
         run: |
+          echo "==> Type checking (mypy)"
           uv run mypy app pipeline tests --ignore-missing-imports --python-version 3.14
 
       - name: Run tests with coverage
         run: |
+          echo "==> Running tests (pytest + coverage)"
           uv run pytest -q --maxfail=1 --disable-warnings \
-            --cov=. --cov-report=term-missing --cov-report=xml:coverage.xml
+            --cov=. --cov-report=term-missing --cov-report=xml:coverage.xml \
+            --cov-fail-under=90
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
@@ -57,6 +72,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
         with:
+          verbose: true
           files: coverage.xml
           flags: unittests
           fail_ci_if_error: false

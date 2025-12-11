@@ -1,4 +1,4 @@
-afrom __future__ import annotations
+from __future__ import annotations
 
 import os
 from dataclasses import dataclass
@@ -46,4 +46,3 @@ def load_config() -> PipelineConfig:
         markdown_root=markdown_root,
         profile_name=profile_name,
     )
-

@@ -1,13 +1,13 @@
-afrom __future__ import annotations
+from __future__ import annotations
 
 import argparse
 import logging
 from pathlib import Path
 
-from .config import load_config
 from .ai_client import build_backend
+from .config import load_config
+from .hypergraph_writer import HypergraphWriter, Node
 from .markdown_loader import iter_markdown
-from .hypergraph_writer import HypergraphWriter, Node, Edge
 from .schema_loader import load_schema  # new import
 
 logger = logging.getLogger("pipeline.cli")
@@ -33,9 +33,7 @@ def main(argv: list[str] | None = None) -> None:
 
 
 def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="Hypergraph pipeline CLI (stub implementation)."
-    )
+    parser = argparse.ArgumentParser(description="Hypergraph pipeline CLI (stub implementation).")
     subparsers = parser.add_subparsers(dest="command")
 
     subparsers.add_parser(
@@ -135,4 +133,3 @@ def cmd_export_sqlite() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -27,14 +27,14 @@ export MARKDOWN_ROOT="knowledge"
 export PROFILE_NAME="profile"
 ````
 
----
+______________________________________________________________________
 
 ## 2. Save your LinkedIn profile as HTML
 
 1. Open your LinkedIn profile in the browser.
-2. Use "Save page as" and choose **Web page, HTML only**.
-3. Rename the file to `profile.html`.
-4. Put it here:
+1. Use "Save page as" and choose **Web page, HTML only**.
+1. Rename the file to `profile.html`.
+1. Put it here:
 
 ```text
 tutorials/linkedin/profile.html
@@ -42,7 +42,7 @@ tutorials/linkedin/profile.html
 
 Do not export as PDF. The bootstrap script expects HTML.
 
----
+______________________________________________________________________
 
 ## 3. Generate markdown from your profile
 
@@ -56,12 +56,12 @@ uv run -m tutorials.linkedin.linkedin_bootstrap \
 
 This will
 
-* parse your profile HTML
-* create markdown under `knowledge/profile/...` for jobs, companies and skills
+- parse your profile HTML
+- create markdown under `knowledge/profile/...` for jobs, companies and skills
 
 You can edit these files at any time.
 
----
+______________________________________________________________________
 
 ## 4. Build or update the hypergraph
 
@@ -85,7 +85,7 @@ uv run -m pipeline.cli update-from-markdown --profile profile
 
 The pipeline reads markdown, applies the schema and writes nodes and hyperedges into the SQLite hypergraph database.
 
----
+______________________________________________________________________
 
 ## 5. Export runtime SQLite snapshot
 
@@ -97,7 +97,7 @@ uv run -m pipeline.cli export-sqlite --profile profile
 
 This writes a new `app/db/data.db` snapshot.
 
----
+______________________________________________________________________
 
 ## 6. Run the backend
 
@@ -111,25 +111,24 @@ uv run uvicorn app.main:app --reload
 
 Note the base URL:
 
-* local: `http://localhost:8000`
-* Cloud Run: the URL from Terraform outputs (`cloud_run_url`)
+- local: `http://localhost:8000`
+- Cloud Run: the URL from Terraform outputs (`cloud_run_url`)
 
----
+______________________________________________________________________
 
 ## 7. Try it from the browser
 
 1. Save `tutorials/linkedin/demo.html` from this repo.
-2. Open it in your browser.
-3. Set `API_BASE` in the script to your backend URL.
+1. Open it in your browser.
+1. Set `API_BASE` in the script to your backend URL.
 
 Then ask questions like:
 
-* `Which roles did I have at <Organization>?`
-* `Which skills show up across all my jobs?`
+- `Which roles did I have at <Organization>?`
+- `Which skills show up across all my jobs?`
 
 The form sends a POST request to `/mcp/query` and shows the JSON response from your LinkedIn based hypergraph.
 
 ```
 ::contentReference[oaicite:0]{index=0}
 ```
-

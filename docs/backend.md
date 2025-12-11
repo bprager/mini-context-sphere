@@ -2,13 +2,13 @@
 
 The backend is a small Python service that
 
-* exposes a gRPC MCP service for tools and agents
-* exposes a thin HTTP JSON facade for the static site and simple clients
-* reads from a local SQLite database baked into the container image
+- exposes a gRPC MCP service for tools and agents
+- exposes a thin HTTP JSON facade for the static site and simple clients
+- reads from a local SQLite database baked into the container image
 
 Everything lives under `app/` and is designed to run on Google Cloud Run and locally via uv.
 
----
+______________________________________________________________________
 
 ## Layout of the backend
 
@@ -24,20 +24,20 @@ You can keep everything in `main.py` at first, then split into modules as the pr
 
 Key ideas
 
-* gRPC defines the canonical MCP API
-* HTTP JSON endpoints are a thin wrapper on top of the gRPC calls
-* SQLite file is read only or read mostly in production
+- gRPC defines the canonical MCP API
+- HTTP JSON endpoints are a thin wrapper on top of the gRPC calls
+- SQLite file is read only or read mostly in production
 
 See `.vibe/API_SPEC.md` for the exact request and response shapes.
 
----
+______________________________________________________________________
 
 ## FastAPI app and HTTP JSON facade
 
 `app/main.py` creates a FastAPI instance and defines simple routes:
 
-* `GET /health` returns a small status object
-* `POST /mcp/query` accepts a JSON body with a single `query` field and returns a list of results
+- `GET /health` returns a small status object
+- `POST /mcp/query` accepts a JSON body with a single `query` field and returns a list of results
 
 Minimal pattern:
 
@@ -84,7 +84,7 @@ def mcp_query(payload: QueryRequest):
 
 The HTTP handler should stay small and delegate to the MCP service or a shared query function.
 
----
+______________________________________________________________________
 
 ## gRPC MCP service
 
@@ -122,21 +122,21 @@ message QueryResponse {
 
 Implementation goals:
 
-* keep the business logic in the gRPC layer or in shared helpers
-* HTTP JSON handlers should call the same query method that the gRPC handler uses
-* follow `.vibe/API_SPEC.md` so JSON and gRPC stay consistent
+- keep the business logic in the gRPC layer or in shared helpers
+- HTTP JSON handlers should call the same query method that the gRPC handler uses
+- follow `.vibe/API_SPEC.md` so JSON and gRPC stay consistent
 
 If you run gRPC and HTTP in the same process, ensure the server supports HTTP 2 for gRPC while still serving HTTP 1.1 JSON routes. Cloud Run can do this with a gRPC capable server stack.
 
----
+______________________________________________________________________
 
 ## SQLite database and query timing
 
 The SQLite file lives at `app/db/data.db` inside the image. The main goals are:
 
-* keep reads fast and predictable
-* avoid external state for small deployments
-* make schema changes and data updates via a new image build
+- keep reads fast and predictable
+- avoid external state for small deployments
+- make schema changes and data updates via a new image build
 
 Basic connection pattern:
 
@@ -178,11 +178,11 @@ def query_documents(term: str):
 
 Good practices:
 
-* open a fresh connection per request for low traffic setups
-* use `row_factory = sqlite3.Row` so results can be converted to dicts easily
-* create indexes that match your query patterns in the build step that generates `data.db`
+- open a fresh connection per request for low traffic setups
+- use `row_factory = sqlite3.Row` so results can be converted to dicts easily
+- create indexes that match your query patterns in the build step that generates `data.db`
 
----
+______________________________________________________________________
 
 ## Logging and health
 
@@ -190,17 +190,17 @@ Observability is intentionally minimal and based on Cloud Run logging and metric
 
 Guidelines:
 
-* use the `mcp` logger for all app logs
-* log an INFO line when a request starts and when it completes
-* log an ERROR with `logger.exception` when a request fails
-* include a few business fields in `extra` (for example `result_count`, `elapsed_ms`) so Cloud Logging filters and simple charts are easy
+- use the `mcp` logger for all app logs
+- log an INFO line when a request starts and when it completes
+- log an ERROR with `logger.exception` when a request fails
+- include a few business fields in `extra` (for example `result_count`, `elapsed_ms`) so Cloud Logging filters and simple charts are easy
 
 Health endpoints:
 
-* `/health` returns a small object with `status` and `version`
-* you can later add `/ready` if you need more detailed readiness checks
+- `/health` returns a small object with `status` and `version`
+- you can later add `/ready` if you need more detailed readiness checks
 
----
+______________________________________________________________________
 
 ## Docker and runtime expectations
 
@@ -227,11 +227,11 @@ CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "808
 
 Key points:
 
-* dependencies are installed with uv using `requirements.txt`
-* `uv run uvicorn ...` is used both locally and in the container
-* Cloud Run sets `PORT`, but the default `8080` works for local dev
+- dependencies are installed with uv using `requirements.txt`
+- `uv run uvicorn ...` is used both locally and in the container
+- Cloud Run sets `PORT`, but the default `8080` works for local dev
 
----
+______________________________________________________________________
 
 ## Local development
 
@@ -245,22 +245,21 @@ uv run uvicorn app.main:app --reload
 
 Then:
 
-* open `http://localhost:8000/health` to check the service
-* test `POST /mcp/query` with `curl` or a small client
-* run gRPC clients against the gRPC endpoint if you expose one locally
+- open `http://localhost:8000/health` to check the service
+- test `POST /mcp/query` with `curl` or a small client
+- run gRPC clients against the gRPC endpoint if you expose one locally
 
 See `docs/dev-env.md` for tests, type checking and linters when those are in place.
 
----
+______________________________________________________________________
 
 ## Where to look next
 
-* API contracts and expectations
+- API contracts and expectations
   `.vibe/API_SPEC.md`
 
-* Overall architecture and flows
+- Overall architecture and flows
   `docs/index.md` and `.vibe/ARCHITECTURE.md`
 
-* Infra and deployment
+- Infra and deployment
   `docs/infra.md` and `.vibe/INFRA_NOTES.md`
-

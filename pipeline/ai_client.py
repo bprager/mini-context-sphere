@@ -27,7 +27,7 @@ class OpenAiBackend:
     def __init__(self, model: str) -> None:
         self.model = model
 
-    def complete(self, prompt: str) -> str:
+    def complete(self, prompt: str) -> str:  # pragma: no cover - stub
         raise NotImplementedError(
             "OpenAiBackend.complete is not implemented yet. "
             "Wire this to the OpenAI SDK or your own client."
@@ -40,7 +40,7 @@ class GeminiBackend:
     def __init__(self, model: str) -> None:
         self.model = model
 
-    def complete(self, prompt: str) -> str:
+    def complete(self, prompt: str) -> str:  # pragma: no cover - stub
         raise NotImplementedError(
             "GeminiBackend.complete is not implemented yet. "
             "Wire this to the Gemini SDK or your own client."
@@ -53,10 +53,9 @@ class OllamaBackend:
     def __init__(self, model: str) -> None:
         self.model = model
 
-    def complete(self, prompt: str) -> str:
+    def complete(self, prompt: str) -> str:  # pragma: no cover - stub
         raise NotImplementedError(
-            "OllamaBackend.complete is not implemented yet. "
-            "Wire this to your Ollama client."
+            "OllamaBackend.complete is not implemented yet. Wire this to your Ollama client."
         )
 
 
@@ -80,4 +79,3 @@ def build_backend(provider: str, model: str) -> AiBackend:
 
     logger.warning("unknown_ai_provider", extra={"provider": provider})
     return NoopBackend()
-

@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import logging
 import sqlite3
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any
 
 logger = logging.getLogger("pipeline.hypergraph")
 
@@ -36,7 +37,7 @@ class HypergraphWriter:
         self.db_path = db_path
         self._conn: sqlite3.Connection | None = None
 
-    def __enter__(self) -> "HypergraphWriter":
+    def __enter__(self) -> HypergraphWriter:
         self._conn = sqlite3.connect(self.db_path)
         self._conn.execute("PRAGMA foreign_keys = ON;")
         # If you use a graph extension, load it here:
@@ -89,9 +90,7 @@ class HypergraphWriter:
         self.conn.commit()
 
     def upsert_node(self, node: Node) -> None:
-        logger.info(
-            "upsert_node", extra={"id": node.id, "type": node.type}
-        )
+        logger.info("upsert_node", extra={"id": node.id, "type": node.type})
         self.conn.execute(
             """
             INSERT INTO nodes (id, type, data)
@@ -140,4 +139,3 @@ def json_dumps(data: dict[str, Any]) -> str:
     import json
 
     return json.dumps(data, ensure_ascii=False)
-

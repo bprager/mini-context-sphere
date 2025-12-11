@@ -4,11 +4,11 @@ This document describes the infrastructure for the Serverless FastMCP Starter. I
 
 The goal is a small, repeatable Terraform setup that creates
 
-* one Cloud Run v2 service for the backend
-* one public bucket for the static site
-* minimal IAM so both are reachable for demo use
+- one Cloud Run v2 service for the backend
+- one public bucket for the static site
+- minimal IAM so both are reachable for demo use
 
----
+______________________________________________________________________
 
 ## Layout
 
@@ -21,7 +21,7 @@ infra/
   outputs.tf     Useful URLs
 ```
 
----
+______________________________________________________________________
 
 ## Variables
 
@@ -54,12 +54,12 @@ variable "container_image" {
 
 You must always set
 
-* `project_id`
-* `container_image`
+- `project_id`
+- `container_image`
 
 You can use the defaults for the rest when starting.
 
----
+______________________________________________________________________
 
 ## Resources that Terraform creates
 
@@ -110,9 +110,9 @@ resource "google_storage_bucket_iam_member" "public" {
 
 Key points
 
-* bucket name is an input variable, so you can make it match a future domain
-* `website` block tells GCS which file is the main page and what to serve for 404
-* IAM member uses `allUsers` with `roles/storage.objectViewer`, which makes the bucket public for demo use
+- bucket name is an input variable, so you can make it match a future domain
+- `website` block tells GCS which file is the main page and what to serve for 404
+- IAM member uses `allUsers` with `roles/storage.objectViewer`, which makes the bucket public for demo use
 
 You can later tighten this by removing the public member and putting a CDN or load balancer in front.
 
@@ -149,9 +149,9 @@ resource "google_cloud_run_v2_service_iam_member" "public_invoker" {
 
 Key points
 
-* service image is passed in as `var.container_image`
-* `min_instance_count = 0` means you only pay when there are requests
-* `INGRESS_TRAFFIC_ALL` and the `public_invoker` IAM member make the service publicly reachable
+- service image is passed in as `var.container_image`
+- `min_instance_count = 0` means you only pay when there are requests
+- `INGRESS_TRAFFIC_ALL` and the `public_invoker` IAM member make the service publicly reachable
 
 You can later replace public invoker with IAM based auth.
 
@@ -173,7 +173,7 @@ output "cloud_run_url" {
 
 After `terraform apply` these appear in the console and you can click or copy them.
 
----
+______________________________________________________________________
 
 ## Observability
 
@@ -181,29 +181,29 @@ The starter keeps observability simple and relies on Cloud Run features.
 
 Out of the box you get
 
-* request logs and container stdout or stderr in Cloud Logging
-* basic metrics in Cloud Monitoring (request count, latency, errors, CPU, memory)
+- request logs and container stdout or stderr in Cloud Logging
+- basic metrics in Cloud Monitoring (request count, latency, errors, CPU, memory)
 
 The application adds
 
-* structured logs from the `mcp` logger in `app/main.py` and database helpers
-* INFO logs for key events, for example `mcp_query_start`, `mcp_query_ok`, `db_query`
-* error logs with `logger.exception` when requests fail
-* simple business fields like `result_count` and `elapsed_ms` in `extra`
+- structured logs from the `mcp` logger in `app/main.py` and database helpers
+- INFO logs for key events, for example `mcp_query_start`, `mcp_query_ok`, `db_query`
+- error logs with `logger.exception` when requests fail
+- simple business fields like `result_count` and `elapsed_ms` in `extra`
 
 You can use Cloud Logging filters to inspect these logs and create basic dashboards in Cloud Monitoring without extra libraries.
 
 If you need deeper tracing in a future version, add OpenTelemetry and export to Cloud Trace. That is intentionally out of scope for this starter.
 
----
+______________________________________________________________________
 
 ## Prerequisites
 
 You need
 
-* a GCP project with billing enabled
-* `gcloud` CLI configured with an account that has enough rights
-* Terraform installed
+- a GCP project with billing enabled
+- `gcloud` CLI configured with an account that has enough rights
+- Terraform installed
 
 You also need a container image built from the project Dockerfile, for example
 
@@ -214,7 +214,7 @@ gcloud builds submit --tag gcr.io/$PROJECT_ID/mcp-image
 
 This uses Cloud Build to build the image and push it to Container Registry or Artifact Registry, depending on your project setup.
 
----
+______________________________________________________________________
 
 ## First deployment
 
@@ -236,10 +236,10 @@ Terraform will show a plan. Confirm and wait until the apply finishes.
 
 You will then see values for
 
-* `static_site_url`
-* `cloud_run_url`
+- `static_site_url`
+- `cloud_run_url`
 
----
+______________________________________________________________________
 
 ## Updating the backend
 
@@ -252,7 +252,7 @@ When you change backend code
    gcloud builds submit --tag gcr.io/$PROJECT_ID/mcp-image
    ```
 
-2. Apply a minimal Terraform update
+1. Apply a minimal Terraform update
 
    ```bash
    cd infra
@@ -263,7 +263,7 @@ When you change backend code
 
 Terraform will detect that the service image changed and update the Cloud Run service.
 
----
+______________________________________________________________________
 
 ## Uploading or updating the static site
 
@@ -283,23 +283,22 @@ To see the site, use the `static_site_url` output or build the URL yourself as
 https://storage.googleapis.com/<bucket-name>/index.html
 ```
 
----
+______________________________________________________________________
 
 ## Domains and production hardening
 
 The current setup is tuned for low friction and free tier use
 
-* public Cloud Run service
-* public static bucket
-* no custom domain yet
+- public Cloud Run service
+- public static bucket
+- no custom domain yet
 
 When you are ready to harden the setup
 
-* add a load balancer and CDN in front of the bucket
-* map a domain to the Cloud Run service
-* remove the `allUsers` members and switch to IAM based access where needed
+- add a load balancer and CDN in front of the bucket
+- map a domain to the Cloud Run service
+- remove the `allUsers` members and switch to IAM based access where needed
 
 Those changes can live in additional Terraform files in the same `infra/` folder or in a dedicated `infra/production` tree, depending on how far you want to take this starter.
 
 <!-- :contentReference[oaicite:1]{index=1} -->
-

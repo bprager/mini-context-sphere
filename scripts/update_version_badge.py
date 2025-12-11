@@ -3,8 +3,8 @@ from __future__ import annotations
 
 import argparse
 import os
-from pathlib import Path
 import re
+from pathlib import Path
 
 
 def infer_color(version: str, override: str | None = None) -> str:
@@ -66,8 +66,8 @@ def render_svg(version: str, color: str) -> str:
   </g>
   <g fill=\"#fff\" text-anchor=\"middle\"
      font-family=\"Verdana,Geneva,DejaVu Sans,sans-serif\" font-size=\"11\">
-    <text x=\"{left_width/2:.1f}\" y=\"14\">{label}</text>
-    <text x=\"{left_width + right_width/2:.1f}\" y=\"14\">{version}</text>
+    <text x=\"{left_width / 2:.1f}\" y=\"14\">{label}</text>
+    <text x=\"{left_width + right_width / 2:.1f}\" y=\"14\">{version}</text>
   </g>
   <svg xmlns=\"http://www.w3.org/2000/svg\"/>
 </svg>
