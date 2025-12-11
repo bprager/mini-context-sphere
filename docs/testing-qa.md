@@ -11,6 +11,7 @@ make qa
 ```
 
 Runs, in order:
+
 - ruff format check and lint
 - Markdown format (mdformat) check and Markdown lint (PyMarkdown)
 - mypy type checking
