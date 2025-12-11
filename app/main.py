@@ -1,14 +1,37 @@
 # AI assistants: see .vibe/AI_DEV_INSTRUCTIONS.md and .vibe/API_SPEC.md
 
 import logging
+import os
 import sqlite3
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-logger = logging.getLogger("mcp")
-logger.setLevel(logging.INFO)
+LOGGER_NAME = "mcp"
+DEFAULT_LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+
+
+def get_logger(name=LOGGER_NAME, level=DEFAULT_LOG_LEVEL):
+    """
+    Returns a configured logger with the specified name and level.
+    Ensures handlers are not duplicated and applies a consistent formatter.
+    """
+    logger = logging.getLogger(name)
+    logger.setLevel(getattr(logging, level, logging.INFO))
+
+    # Prevent adding multiple handlers if already configured
+    if not logger.handlers:
+        handler = logging.StreamHandler()
+        formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+        logger.propagate = False  # Prevent double logging if root logger is configured
+
+    return logger
+
+
+logger = get_logger()
 
 DB_PATH = Path(__file__).parent / "db" / "data.db"
 

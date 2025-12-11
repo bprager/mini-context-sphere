@@ -7,6 +7,17 @@ and this project adheres to Semantic Versioning, https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.3.1] - 2025-12-11
+
+### Fixed
+
+- CI: scope Markdown format/lint (mdformat, PyMarkdown) to project paths to avoid scanning the virtualenv, resolving failing runs on main.
+- Codecov upload: stabilized local uploader flags and ensured CI upload remains green.
+- VS Code: added workspace settings to use `.venv`, enable pytest, and migrate Ruff to the new extension model; added extension recommendations to reduce editor warnings (e.g., "Unable to import 'fastapi'").
+- README: streamlined Docs section, added/remodeled badges (CI, CodeQL, Coverage, Release, Version, License, Python, mypy, ruff, pre-commit, Dependabot) and removed redundant tag badge.
+- Release workflow: improved `release-notes` version/tag handling; created v0.3.0 GitHub Release so the Release badge resolves.
+- Dependencies: synchronized `requirements.txt` with `pyproject.toml` (added `PyYAML`, aligned version floors) for consistent Docker builds.
+
 ## [0.3.0] - 2025-12-10
 
 ### Added

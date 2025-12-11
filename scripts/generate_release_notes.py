@@ -52,7 +52,7 @@ def extract_section(changelog: Path, version: str) -> list[str]:
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description="Generate release notes from CHANGELOG.md")
     p.add_argument("--version", help="Version without 'v' prefix (e.g., 0.2.0)")
-    p.add_argument("--changelog", default="docs/CHANGELOG.md", help="Path to changelog file")
+    p.add_argument("--changelog", default="CHANGELOG.md", help="Path to changelog file")
     p.add_argument("--out", help="Output file to write. Prints to stdout if omitted")
     args = p.parse_args(argv)
 
