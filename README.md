@@ -47,14 +47,24 @@ Then open <http://localhost:8000> and hit `/health` or the JSON facade used by t
 
 ## Docs
 
-- Start with the big picture in the [overview](docs/index.md).
-- Build APIs and data flow via the [backend guide](docs/backend.md).
-- Shape and ship the UI with the [static site guide](docs/static-site.md).
-- Deploy on GCP using the [infra guide](docs/infra.md).
-- Set up your machine with the [dev environment guide](docs/dev-env.md).
-- Keep quality high using the [testing and QA guide](docs/testing-qa.md).
-- Track what’s coming next on the [roadmap](docs/roadmap.md).
-- For deeper architecture notes and API contracts, see the `.vibe/` folder.
+- Big picture: start with the project overview.
+  See the overview to understand components and flow (docs/index.md).
+- Backend: how the FastAPI + gRPC MCP server and SQLite DB fit together.
+  Learn how to run locally and generate stubs (docs/backend.md).
+- Static site: how to build and ship the UI.
+  Steps to tweak the frontend and connect to the API (docs/static-site.md).
+- Infra: deploy on Google Cloud using Terraform.
+  From Cloud Run to a public bucket (docs/infra.md).
+- Dev environment: get your machine ready.
+  Tools, Python env, and editor setup (docs/dev-env.md).
+- Testing & QA: the one‑command quality gate.
+  What `make qa` runs and how CI enforces it (docs/testing-qa.md).
+- Pipeline optimization: faster ingest and queries on SQLite.
+  Pragmas, indexes, FTS, batching (docs/pipeline-optimization.md).
+- Roadmap: what’s next and why.
+  Priorities and milestones (docs/roadmap.md).
+- Deep dives: design notes and API contracts.
+  Explore the `.vibe/` folder for architecture and specs.
 
 ## Deploy to GCP
 

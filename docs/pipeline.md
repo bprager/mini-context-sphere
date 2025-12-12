@@ -1,6 +1,6 @@
 # Data pipeline and hypergraph
 
-This document describes the data pipeline that turns user provided markdown into a SQLite based hypergraph knowledge base, using a SQLite graph extension, and optionally into the SQLite snapshot used by the runtime backend. The pipeline is small, easy to customize and optional, so the core starter remains minimal.
+This document describes the data pipeline that turns user provided markdown into a SQLite based hypergraph knowledge base, and optionally into the SQLite snapshot used by the runtime backend. The pipeline is small, easy to customize and optional, so the core starter remains minimal.
 
 ______________________________________________________________________
 
@@ -17,7 +17,7 @@ ______________________________________________________________________
 ## High level architecture
 
 ```text
-markdown sources ─► AI builder ─► hypergraph (SQLite + graph extension)
+markdown sources ─► AI builder ─► hypergraph (SQLite)
        ▲                                       │
        │                                 optional export
 LinkedIn tutorial bootstrap                   ▼
@@ -156,16 +156,18 @@ ______________________________________________________________________
 
 ## Hypergraph writer
 
-`hypergraph_writer.py` is responsible for talking to PostgreSQL. It should hide table structure behind simple helpers, such as:
+`hypergraph_writer.py` is responsible for talking to SQLite. It hides table structure behind simple helpers, such as:
 
 - `upsert_node(node)`
 - `upsert_edge(edge)`
 - `upsert_hyperedge(hyperedge)`
 
-For the starter, you can keep the hypergraph tables very simple:
+For the starter, the hypergraph tables are very simple and already implemented in the codebase:
 
-- `nodes(id text primary key, type text, data jsonb)`
-- `edges(id text primary key, type text, source text, target text, data jsonb)`
+- `nodes(id text primary key, type text, data json)`
+- `edges(id text primary key, type text, source text, target text, data json)`
+- `hyperedges(id text primary key, type text, data json)`
+- `hyperedge_entities(hyperedge_id text, entity_id text, role text, ordinal int, data json)`
 
 Later, you can refine this schema without changing the rest of the pipeline interface.
 
@@ -192,7 +194,7 @@ uv run -m pipeline.cli update-from-markdown --profile profile
 uv run -m pipeline.cli export-sqlite --profile profile
 ```
 
-The CLI can start as stubs that log what they would do, then be filled in gradually.
+The CLI runs end-to-end: it loads markdown, upserts nodes into SQLite, and prepares FTS for fast runtime queries. AI steps are still optional and can be layered in.
 
 ______________________________________________________________________
 
@@ -224,7 +226,9 @@ uv run -m pipeline.cli export-sqlite --profile profile
 After this, the backend runtime has:
 
 - a `data.db` snapshot generated from the user’s own profile,
-- a SQLite hypergraph database that can be explored and updated via markdown edits and pipeline runs
+- a SQLite hypergraph database that can be explored and updated via markdown edits and pipeline runs.
+
+See also: pipeline optimization tips in `docs/pipeline-optimization.md`.
 
 ______________________________________________________________________
 

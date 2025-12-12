@@ -34,6 +34,11 @@ class McpServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        self.Health = channel.unary_unary(
+                '/mcp.McpService/Health',
+                request_serializer=mcp__pb2.HealthRequest.SerializeToString,
+                response_deserializer=mcp__pb2.HealthStatus.FromString,
+                _registered_method=True)
         self.Query = channel.unary_stream(
                 '/mcp.McpService/Query',
                 request_serializer=mcp__pb2.QueryRequest.SerializeToString,
@@ -58,6 +63,12 @@ class McpServiceStub(object):
 
 class McpServiceServicer(object):
     """Missing associated documentation comment in .proto file."""
+
+    def Health(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
 
     def Query(self, request, context):
         """Missing associated documentation comment in .proto file."""
@@ -86,6 +97,11 @@ class McpServiceServicer(object):
 
 def add_McpServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
+            'Health': grpc.unary_unary_rpc_method_handler(
+                    servicer.Health,
+                    request_deserializer=mcp__pb2.HealthRequest.FromString,
+                    response_serializer=mcp__pb2.HealthStatus.SerializeToString,
+            ),
             'Query': grpc.unary_stream_rpc_method_handler(
                     servicer.Query,
                     request_deserializer=mcp__pb2.QueryRequest.FromString,
@@ -116,6 +132,33 @@ def add_McpServiceServicer_to_server(servicer, server):
  # This class is part of an EXPERIMENTAL API.
 class McpService(object):
     """Missing associated documentation comment in .proto file."""
+
+    @staticmethod
+    def Health(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/mcp.McpService/Health',
+            mcp__pb2.HealthRequest.SerializeToString,
+            mcp__pb2.HealthStatus.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def Query(request,

@@ -9,9 +9,15 @@ def make_temp_db(tmp_path: Path) -> Path:
     db_path = tmp_path / "data.db"
     conn = sqlite3.connect(db_path)
     try:
-        conn.execute("CREATE TABLE documents (id INTEGER PRIMARY KEY, content TEXT)")
-        conn.execute("INSERT INTO documents (content) VALUES (?)", ("hello world",))
-        conn.execute("INSERT INTO documents (content) VALUES (?)", ("another doc",))
+        conn.execute("CREATE TABLE nodes (id TEXT PRIMARY KEY, type TEXT, data TEXT)")
+        conn.execute(
+            "INSERT INTO nodes (id, type, data) VALUES (?, ?, json(?))",
+            ("n1", "Doc", '{"name": "hello world"}'),
+        )
+        conn.execute(
+            "INSERT INTO nodes (id, type, data) VALUES (?, ?, json(?))",
+            ("n2", "Doc", '{"name": "another doc"}'),
+        )
         conn.commit()
     finally:
         conn.close()
@@ -54,9 +60,9 @@ def test_mcp_query_returns_results(tmp_path: Path):
     resp = client.post("/mcp/query", json={"query": "hello"})
     assert resp.status_code == 200
     data = resp.json()
-    assert "results" in data
-    assert isinstance(data["results"], list)
-    assert any("hello" in r["content"] for r in data["results"])  # one row matches
+    assert "nodes" in data
+    assert isinstance(data["nodes"], list)
+    assert any("hello" in n["data"].get("name", "") for n in data["nodes"])  # one row matches
 
 
 def test_mcp_query_no_match_and_error(tmp_path: Path):
@@ -70,7 +76,7 @@ def test_mcp_query_no_match_and_error(tmp_path: Path):
 
     resp = client.post("/mcp/query", json={"query": "zzz-not-found"})
     assert resp.status_code == 200
-    assert resp.json()["results"] == []
+    assert resp.json()["nodes"] == []
 
     # Point to a DB with missing table to exercise error path
     bad_db = tmp_path / "empty.db"
@@ -111,9 +117,9 @@ def test_mcp_query_direct_success(tmp_path: Path):
     db_path = make_temp_db(tmp_path)
     app_main.DB_PATH = db_path
 
-    result = app_main.mcp_query(app_main.Query(query="hello"))
-    assert hasattr(result, "results")
-    assert any("hello" in r.content for r in result.results)
+    result = app_main.mcp_query(app_main.Query(query="hello")).model_dump()
+    assert "nodes" in result and isinstance(result["nodes"], list)
+    assert any("hello" in n["data"].get("name", "") for n in result["nodes"])
 
 
 def test_mcp_query_direct_error(tmp_path: Path):

@@ -11,6 +11,7 @@ Done:
 
 Next:
 
-- Hypergraph: Add hyperedge/link tables to the SQLite model and extend the gRPC API with `UpsertEdges`/`UpsertHyperedges`.
-- Query: Implement FTS5 and neighbor expansion; unify HTTP `/mcp/query` and gRPC `Query` via a shared planner.
-- Deploy: Optionally split gRPC into a separate Cloud Run service; add a health RPC.
+- Hypergraph: Landed hyperedge/link tables and batch upserts in the writer; extend tutorial/pipeline to populate them from markdown and schema roles.
+- Query: Implemented FTS5 with triggers and neighbor expansion via a shared planner used by both HTTP `/mcp/query` and gRPC `Query`.
+- gRPC: Service implements Query + UpsertNodes/Edges/Hyperedges and a simple Health RPC; tests cover query parity between HTTP and gRPC.
+- Deploy: Consider running gRPC as a separate service if needed; keep HTTP JSON for the static site.

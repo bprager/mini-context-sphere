@@ -23,9 +23,9 @@ def main(argv: list[str] | None = None) -> None:
         return
 
     if args.command == "init-from-markdown":
-        cmd_init_from_markdown()
+        cmd_init_from_markdown(args)
     elif args.command == "update-from-markdown":
-        cmd_update_from_markdown()
+        cmd_update_from_markdown(args)
     elif args.command == "export-sqlite":
         cmd_export_sqlite()
     else:
@@ -36,14 +36,29 @@ def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Hypergraph pipeline CLI (stub implementation).")
     subparsers = parser.add_subparsers(dest="command")
 
-    subparsers.add_parser(
+    p_init = subparsers.add_parser(
         "init-from-markdown",
         help="Initialize hypergraph from markdown for the configured profile.",
     )
+    p_init.add_argument(
+        "--rebuild",
+        action="store_true",
+        help="Rebuild the hypergraph database from scratch (deletes existing db file).",
+    )
+    p_init.add_argument(
+        "--append",
+        action="store_true",
+        help="Append/update into the existing hypergraph (default).",
+    )
 
-    subparsers.add_parser(
+    p_upd = subparsers.add_parser(
         "update-from-markdown",
         help="Update existing hypergraph from markdown for the configured profile.",
+    )
+    p_upd.add_argument(
+        "--append",
+        action="store_true",
+        help="Append/update into the existing hypergraph (default).",
     )
 
     subparsers.add_parser(
@@ -54,7 +69,9 @@ def _build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def cmd_init_from_markdown() -> None:
+def cmd_init_from_markdown(args: argparse.Namespace | None = None) -> None:
+    if args is None:
+        args = argparse.Namespace(rebuild=False, append=True)
     cfg = load_config()
     logger.info(
         "init_from_markdown_start",
@@ -64,6 +81,14 @@ def cmd_init_from_markdown() -> None:
             "profile_name": cfg.profile_name,
         },
     )
+
+    # Rebuild: remove existing db file for a clean slate
+    if getattr(args, "rebuild", False) and cfg.hypergraph_db_path.exists():
+        try:
+            cfg.hypergraph_db_path.unlink()
+            logger.info("rebuild_db_removed", extra={"path": str(cfg.hypergraph_db_path)})
+        except OSError:
+            logger.exception("rebuild_db_remove_failed")
 
     backend = build_backend(cfg.ai_provider, cfg.ai_model)
     profile_root = cfg.profile_root
@@ -79,20 +104,23 @@ def cmd_init_from_markdown() -> None:
     logger.info("markdown_documents_found", extra={"count": len(docs)})
 
     # Stub: just creates the DB and logs nodes that would be created.
-    with HypergraphWriter(cfg.hypergraph_db_path) as writer:
+    # Use build_mode for faster bulk ingestion, then finalize FTS
+    with HypergraphWriter(cfg.hypergraph_db_path, build_mode=True) as writer:
         for doc in docs:
             node_id = doc.metadata.get("id") or doc.path.stem
             # if the doc has a type, use it, otherwise fall back to "Document"
             node_type = doc.metadata.get("type") or "Document"
             node = Node(id=node_id, type=node_type, data=doc.metadata)
             writer.upsert_node(node)
+        # Prepare FTS for fast text search at runtime
+        writer.finalize_fts()
         logger.info("init_from_markdown_done", extra={"nodes": len(docs)})
 
     # backend.complete is not used yet, but it is built so the interface is tested.
     _ = backend
 
 
-def cmd_update_from_markdown() -> None:
+def cmd_update_from_markdown(args: argparse.Namespace | None = None) -> None:
     cfg = load_config()
     logger.info(
         "update_from_markdown_start",
@@ -104,7 +132,12 @@ def cmd_update_from_markdown() -> None:
     )
 
     # For now, this does the same as init and can be refined later.
-    cmd_init_from_markdown()
+    # Force append semantics on update
+    if args is None:
+        args = argparse.Namespace(rebuild=False, append=True)
+    else:
+        args.rebuild = False
+    cmd_init_from_markdown(args)
     logger.info("update_from_markdown_done")
 
 

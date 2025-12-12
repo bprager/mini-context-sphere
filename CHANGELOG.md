@@ -7,6 +7,16 @@ and this project adheres to Semantic Versioning, https://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.4.1] - 2025-12-11
+
+### Changed
+
+- Docs: Added SQLite pipeline optimization guide and linked it from README; aligned pipeline documentation with current SQLite schema and hyperedge/link tables.
+- Status: Updated .vibe/STATUS.md to reflect implemented gRPC, FTS, and parity tests; clarified next actions.
+- Runtime: Lazy import for gRPC bootstrap in FastAPI app to avoid requiring grpc unless enabled.
+- Deps: Synced `requirements.txt` with runtime deps (`grpcio`).
+- QA: Ensured Markdown formatting with mdformat; formatting fixes for tests.
+
 ## [0.4.0] - 2025-12-11
 
 ### Added

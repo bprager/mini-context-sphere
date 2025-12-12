@@ -8,11 +8,12 @@ import logging
 import os
 import sqlite3
 from pathlib import Path
+from typing import Any
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from .mcp_service import serve_grpc
+from .query import QueryOpts, run_query
 
 LOGGER_NAME = "mcp"
 DEFAULT_LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
@@ -52,15 +53,28 @@ def connect():
 
 class Query(BaseModel):
     query: str
+    limit: int = 10
+    expand_neighbors: bool = False
+    neighbor_budget: int = 0
 
 
-class QueryResult(BaseModel):
-    id: int
-    content: str
+class GraphNode(BaseModel):
+    id: str
+    type: str
+    data: dict[str, Any]
 
 
-class QueryResponse(BaseModel):
-    results: list[QueryResult]
+class GraphEdge(BaseModel):
+    id: str
+    type: str
+    source: str
+    target: str
+    data: dict[str, Any]
+
+
+class GraphResponse(BaseModel):
+    nodes: list[GraphNode]
+    edges: list[GraphEdge]
 
 
 @app.get("/health")
@@ -69,17 +83,20 @@ def health():
 
 
 @app.post("/mcp/query")
-def mcp_query(payload: Query):
+def mcp_query(payload: Query) -> GraphResponse:
     logger.info("mcp_query_start", extra={"query": payload.query})
     conn = None
     try:
         conn = connect()
-        cur = conn.cursor()
-        cur.execute(
-            "SELECT id, content FROM documents WHERE content LIKE ? LIMIT 10",
-            (f"%{payload.query}%",),
+        result = run_query(
+            conn,
+            QueryOpts(
+                term=payload.query,
+                limit=payload.limit,
+                expand_neighbors=payload.expand_neighbors,
+                neighbor_budget=payload.neighbor_budget,
+            ),
         )
-        rows = [dict(r) for r in cur.fetchall()]
     except Exception as exc:
         logger.exception("mcp_query_error")
         raise HTTPException(status_code=500, detail=str(exc)) from exc
@@ -89,8 +106,17 @@ def mcp_query(payload: Query):
                 conn.close()
             except Exception:
                 pass
-    logger.info("mcp_query_ok", extra={"result_count": len(rows)})
-    return QueryResponse(results=[QueryResult(**row) for row in rows])
+    logger.info(
+        "mcp_query_ok",
+        extra={
+            "node_count": len(result.get("nodes", [])),
+            "edge_count": len(result.get("edges", [])),
+        },
+    )
+    return GraphResponse(
+        nodes=[GraphNode(**n) for n in result.get("nodes", [])],
+        edges=[GraphEdge(**e) for e in result.get("edges", [])],
+    )
 
 
 # Optional: start gRPC server when running under uvicorn, if enabled by env
@@ -98,6 +124,8 @@ _START_GRPC = os.getenv("START_GRPC", "false").lower() in {"1", "true", "yes"}
 _GRPC_PORT = int(os.getenv("GRPC_PORT", "50051"))
 if _START_GRPC:
     try:
+        # Lazy import so running the HTTP app does not require grpcio unless enabled
+        from .mcp_service import serve_grpc
 
         async def _start():
             await serve_grpc(DB_PATH, port=_GRPC_PORT)

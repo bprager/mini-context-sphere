@@ -53,10 +53,14 @@ message UpsertHyperedgesRequest { repeated Hyperedge hyperedges = 1; }
 
 message Ack { bool ok = 1; string message = 2; }
 
+// Simple health check
+message HealthRequest {}
+message HealthStatus { bool ok = 1; string message = 2; }
+
 service McpService {
+  rpc Health (HealthRequest) returns (HealthStatus);
   rpc Query (QueryRequest) returns (stream QueryResult);
   rpc UpsertNodes (UpsertNodesRequest) returns (Ack);
   rpc UpsertEdges (UpsertEdgesRequest) returns (Ack);
   rpc UpsertHyperedges (UpsertHyperedgesRequest) returns (Ack);
 }
-
