@@ -64,3 +64,27 @@ def test_run_query_with_neighbors(tmp_path: Path):
         assert ("e1", "n1", "n2") in edges
     finally:
         conn.close()
+
+
+def test_run_query_with_neighbors_no_ranking(tmp_path: Path):
+    db_path = _setup_db(tmp_path)
+    conn = sqlite3.connect(db_path)
+    conn.row_factory = sqlite3.Row
+    try:
+        # Explicitly disable ranking and ensure behavior still returns neighbors
+        result = run_query(
+            conn,
+            QueryOpts(
+                term="Alice",
+                limit=10,
+                expand_neighbors=True,
+                neighbor_budget=10,
+                neighbor_ranking="none",
+            ),
+        )
+        node_ids = {n["id"] for n in result["nodes"]}
+        assert {"n1", "n2"}.issubset(node_ids)
+        edges = {(e["id"], e["source"], e["target"]) for e in result["edges"]}
+        assert ("e1", "n1", "n2") in edges
+    finally:
+        conn.close()

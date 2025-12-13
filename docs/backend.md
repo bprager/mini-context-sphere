@@ -37,7 +37,12 @@ ______________________________________________________________________
 `app/main.py` creates a FastAPI instance and defines simple routes:
 
 - `GET /health` returns a small status object
-- `POST /mcp/query` accepts a JSON body with a single `query` field and returns a list of results
+- `POST /mcp/query` accepts a JSON body and returns a subgraph. Request fields:
+  - `query` (string)
+  - `limit` (int, default 10)
+  - `expand_neighbors` (bool, default false)
+  - `neighbor_budget` (int, default 0)
+  - `neighbor_ranking` (string: `"degree"` or `"none"`, default `"degree"`)
 
 Minimal pattern:
 
@@ -54,6 +59,10 @@ app = FastAPI(title="FastMCP API")
 
 class QueryRequest(BaseModel):
     query: str
+    limit: int = 10
+    expand_neighbors: bool = False
+    neighbor_budget: int = 0
+    neighbor_ranking: str = "degree"
 
 
 class QueryResult(BaseModel):

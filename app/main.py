@@ -56,6 +56,7 @@ class Query(BaseModel):
     limit: int = 10
     expand_neighbors: bool = False
     neighbor_budget: int = 0
+    neighbor_ranking: str = "degree"  # "degree" or "none"
 
 
 class GraphNode(BaseModel):
@@ -95,6 +96,7 @@ def mcp_query(payload: Query) -> GraphResponse:
                 limit=payload.limit,
                 expand_neighbors=payload.expand_neighbors,
                 neighbor_budget=payload.neighbor_budget,
+                neighbor_ranking=payload.neighbor_ranking,
             ),
         )
     except Exception as exc:

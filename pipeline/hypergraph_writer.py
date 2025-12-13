@@ -55,8 +55,20 @@ class HypergraphWriter:
         self._conn: sqlite3.Connection | None = None
 
     def __enter__(self) -> HypergraphWriter:
+        # Detect whether this is a brand new database file before connecting
+        is_new_db = not self.db_path.exists()
         self._conn = sqlite3.connect(self.db_path)
         self._conn.execute("PRAGMA foreign_keys = ON;")
+        # Page and cache tuning: set page size before initializing schema on new DBs
+        try:
+            if is_new_db:
+                self._conn.execute("PRAGMA page_size=4096;")
+            # Keep more pages in memory and enable mmap for read performance
+            self._conn.execute("PRAGMA cache_size=-200000;")  # ~200MB
+            self._conn.execute("PRAGMA mmap_size=134217728;")  # 128 MiB
+        except sqlite3.DatabaseError:
+            # Pragmas may be unavailable depending on build; ignore safely
+            pass
         if self.build_mode:
             # Speed up batch ingestion while keeping durability reasonable.
             self._conn.execute("PRAGMA journal_mode=WAL;")
@@ -142,10 +154,12 @@ class HypergraphWriter:
         cur.execute("CREATE INDEX IF NOT EXISTS idx_nodes_type ON nodes(type);")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_edges_source ON edges(source);")
         cur.execute("CREATE INDEX IF NOT EXISTS idx_edges_target ON edges(target);")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_edges_type ON edges(type);")
         cur.execute(
             "CREATE INDEX IF NOT EXISTS idx_he_by_hyperedge ON hyperedge_entities(hyperedge_id);"
         )
         cur.execute("CREATE INDEX IF NOT EXISTS idx_he_by_entity ON hyperedge_entities(entity_id);")
+        cur.execute("CREATE INDEX IF NOT EXISTS idx_hyperedges_type ON hyperedges(type);")
         self.conn.commit()
 
     def upsert_node(self, node: Node) -> None:

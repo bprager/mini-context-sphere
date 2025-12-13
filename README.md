@@ -26,6 +26,7 @@ See the [roadmap](docs/roadmap.md) for planned features and future direction.
 - Start with gRPC enabled: `START_GRPC=true uv run uvicorn app.main:app --reload` (see the [backend guide](docs/backend.md))
 - Generate gRPC stubs: `make proto` (proto in `proto/mcp.proto`)
 - Deploy to Cloud Run/GCS: follow the [infra guide](docs/infra.md)
+- Build hypergraph from markdown: see [pipeline](docs/pipeline.md)
 
 ## Features
 
@@ -45,6 +46,28 @@ uv run uvicorn app.main:app --reload
 
 Then open <http://localhost:8000> and hit `/health` or the JSON facade used by the static site.
 
+### Pipeline CLI (optional)
+
+Ingest markdown into a SQLite hypergraph and export a runtime snapshot:
+
+```
+# Configure where to read and write
+export HYPERGRAPH_DB_PATH=hypergraph.db
+export MARKDOWN_ROOT=knowledge
+export PROFILE_NAME=profile
+
+# Initialize from markdown (uses front‑matter id or file stem by default)
+uv run -m pipeline.cli init-from-markdown
+
+# Optional: use content-hash IDs when no explicit id is present
+uv run -m pipeline.cli --content-hash-ids init-from-markdown
+
+# Export snapshot for the app at app/db/data.db
+uv run -m pipeline.cli export-sqlite
+```
+
+Environment variables: `HYPERGRAPH_DB_PATH`, `MARKDOWN_ROOT`, `PROFILE_NAME`, `AI_PROVIDER`, `AI_MODEL`, and `CONTENT_HASH_IDS` (boolean, alternative to `--content-hash-ids`).
+
 ## Docs
 
 - Big picture: start with the project overview.
@@ -61,6 +84,7 @@ Then open <http://localhost:8000> and hit `/health` or the JSON facade used by t
   What `make qa` runs and how CI enforces it (docs/testing-qa.md).
 - Pipeline optimization: faster ingest and queries on SQLite.
   Pragmas, indexes, FTS, batching (docs/pipeline-optimization.md).
+  Includes optional cache/mmap tuning and type indexes for hot paths.
 - Roadmap: what’s next and why.
   Priorities and milestones (docs/roadmap.md).
 - Deep dives: design notes and API contracts.

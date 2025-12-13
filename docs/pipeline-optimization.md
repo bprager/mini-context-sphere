@@ -30,6 +30,14 @@ FTS5 for text search
 - Backfill after ingest (full refresh) via `finalize_fts()` so runtime doesn’t pay setup cost.
 - Query planner prefers FTS when present and falls back to `LIKE` otherwise.
 
+Connection tuning
+
+- On open, for new DBs set `PRAGMA page_size=4096;` to match typical filesystem blocks.
+- Increase cache and enable memory‑mapped I/O when available:
+  - `PRAGMA cache_size=-200000;` (approx 200MB)
+  - `PRAGMA mmap_size=134217728;` (128 MiB)
+    These are best‑effort; unavailable pragmas are ignored safely in code.
+
 Batch upserts
 
 - Use `executemany` for nodes and edges to reduce round trips during ingest (`upsert_nodes`, `upsert_edges`).

@@ -10,6 +10,16 @@ def make_temp_db(tmp_path: Path) -> Path:
     conn = sqlite3.connect(db_path)
     try:
         conn.execute("CREATE TABLE nodes (id TEXT PRIMARY KEY, type TEXT, data TEXT)")
+        # edges table is optional in some tests but needed for neighbor expansion
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS edges (\n"
+            "  id TEXT PRIMARY KEY,\n"
+            "  type TEXT,\n"
+            "  source TEXT,\n"
+            "  target TEXT,\n"
+            "  data TEXT\n"
+            ")"
+        )
         conn.execute(
             "INSERT INTO nodes (id, type, data) VALUES (?, ?, json(?))",
             ("n1", "Doc", '{"name": "hello world"}'),
@@ -63,6 +73,30 @@ def test_mcp_query_returns_results(tmp_path: Path):
     assert "nodes" in data
     assert isinstance(data["nodes"], list)
     assert any("hello" in n["data"].get("name", "") for n in data["nodes"])  # one row matches
+
+
+def test_mcp_query_neighbor_ranking_flag(tmp_path: Path):
+    from app import main as app_main
+
+    db_path = make_temp_db(tmp_path)
+    app_main.DB_PATH = db_path
+
+    TestClient = _get_testclient()
+    client = TestClient(app_main.app)
+
+    # Ensure request accepts neighbor_ranking and succeeds
+    resp = client.post(
+        "/mcp/query",
+        json={
+            "query": "hello",
+            "expand_neighbors": True,
+            "neighbor_budget": 5,
+            "neighbor_ranking": "none",
+        },
+    )
+    assert resp.status_code == 200
+    payload = resp.json()
+    assert isinstance(payload.get("nodes", []), list)
 
 
 def test_mcp_query_no_match_and_error(tmp_path: Path):

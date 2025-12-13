@@ -194,6 +194,22 @@ uv run -m pipeline.cli update-from-markdown --profile profile
 uv run -m pipeline.cli export-sqlite --profile profile
 ```
 
+ID strategy:
+
+- If a markdown file has a front‑matter `id`, that value is used.
+- If not, by default the file stem (basename without extension) is used.
+- Optionally, enable content‑hash IDs when no explicit id is present:
+
+```bash
+uv run -m pipeline.cli --content-hash-ids init-from-markdown --profile profile
+
+# or via env
+export CONTENT_HASH_IDS=1
+uv run -m pipeline.cli init-from-markdown --profile profile
+```
+
+Content‑hash mode helps deduplicate nodes across file renames or reorganization.
+
 The CLI runs end-to-end: it loads markdown, upserts nodes into SQLite, and prepares FTS for fast runtime queries. AI steps are still optional and can be layered in.
 
 ______________________________________________________________________

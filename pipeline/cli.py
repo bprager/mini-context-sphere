@@ -7,7 +7,7 @@ from pathlib import Path
 from .ai_client import build_backend
 from .config import load_config
 from .hypergraph_writer import HypergraphWriter, Node
-from .markdown_loader import iter_markdown
+from .markdown_loader import MarkdownDocument, iter_markdown
 from .schema_loader import load_schema  # new import
 
 logger = logging.getLogger("pipeline.cli")
@@ -17,6 +17,12 @@ def main(argv: list[str] | None = None) -> None:
     logging.basicConfig(level=logging.INFO)
     parser = _build_parser()
     args = parser.parse_args(argv)
+
+    # Optional CLI flag to enable content-hash based IDs across commands
+    if getattr(args, "content_hash_ids", False):
+        import os as _os
+
+        _os.environ["CONTENT_HASH_IDS"] = "1"
 
     if not hasattr(args, "command") or args.command is None:
         parser.print_help()
@@ -34,6 +40,14 @@ def main(argv: list[str] | None = None) -> None:
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Hypergraph pipeline CLI (stub implementation).")
+    parser.add_argument(
+        "--content-hash-ids",
+        action="store_true",
+        help=(
+            "When no explicit front-matter id is present, generate a content-hash based id. "
+            "This can also be toggled via CONTENT_HASH_IDS env var."
+        ),
+    )
     subparsers = parser.add_subparsers(dest="command")
 
     p_init = subparsers.add_parser(
@@ -107,8 +121,7 @@ def cmd_init_from_markdown(args: argparse.Namespace | None = None) -> None:
     # Use build_mode for faster bulk ingestion, then finalize FTS
     with HypergraphWriter(cfg.hypergraph_db_path, build_mode=True) as writer:
         for doc in docs:
-            node_id = doc.metadata.get("id") or doc.path.stem
-            # if the doc has a type, use it, otherwise fall back to "Document"
+            node_id = _stable_markdown_id(doc)
             node_type = doc.metadata.get("type") or "Document"
             node = Node(id=node_id, type=node_type, data=doc.metadata)
             writer.upsert_node(node)
@@ -166,3 +179,29 @@ def cmd_export_sqlite() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+def _stable_markdown_id(doc: MarkdownDocument) -> str:
+    """Return a stable, deterministic node id for a markdown document.
+
+    Strategy:
+    - Prefer explicit front-matter `id` when present and non-empty
+    - If CONTENT_HASH_IDS=1 and no explicit id, use a content hash of metadata+body
+    - Otherwise fallback to the file stem (without extension)
+    Both are deterministic across runs and preserve existing behavior.
+    Hash mode helps deduplicate across renames.
+    """
+    import json
+    import os
+    from hashlib import md5
+
+    explicit = (doc.metadata.get("id") or "").strip()
+    if explicit:
+        return explicit
+
+    use_hash = os.getenv("CONTENT_HASH_IDS", "0").lower() in {"1", "true", "yes"}
+    if use_hash:
+        payload = json.dumps({"meta": doc.metadata, "body": doc.body}, ensure_ascii=False)
+        return "doc-" + md5(payload.encode("utf-8")).hexdigest()
+
+    return doc.path.stem
